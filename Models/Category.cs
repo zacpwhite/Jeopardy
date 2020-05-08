@@ -13,6 +13,8 @@ namespace Jeopardy.Models {
 
         public Round Round { get; set; }
 
+        public int GameId { get; set; }
+
         public Game Game { get; set; }
 
         public ICollection<Answer> Answers { get; set; }

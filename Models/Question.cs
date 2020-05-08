@@ -8,6 +8,8 @@ namespace Jeopardy.Models
 
         public bool IsCorrect { get; set; }
 
+        public int AnswerId { get; set; }
+
         public Answer Answer { get; set; }
     }
 }

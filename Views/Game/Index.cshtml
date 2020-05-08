@@ -1,0 +1,24 @@
+@model GameViewModel
+
+@{
+    ViewData["Title"] = "Game";
+}
+
+@for(var a = -1; a < Model.Categories[0].Answers.Count(); a++)
+{
+    <div class='row @(a == -1 ? "text-white" : "")'>
+        @for(var c = 0; c < Model.Categories.Count(); c++) {
+            <div class="col bg-primary py-5 border border-white rounded">
+                <h2 class="text-center">
+                    @if (a == -1) {
+                        @Model.Categories[c].CategoryName
+                    } else {
+                        <a href="#" class="text-warning">
+                            @($"${Model.Categories[c].Answers[a].AnswerValue}")
+                        </a>
+                    }
+                </h2>
+            </div>      
+        }
+    </div>
+}

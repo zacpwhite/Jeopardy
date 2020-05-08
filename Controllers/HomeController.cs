@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Jeopardy.Models;
+using Jeopardy.Models.ViewModels;
 
 namespace Jeopardy.Controllers
 {

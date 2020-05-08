@@ -23,8 +23,8 @@ namespace Jeopardy.Controllers
         for(var i = 1; i <= 6; i++) {
             categories.Add(new CategoryViewModel(){
                 CategoryId = i,
-                CategoryName = $"Category {i}",
-                CategoryOrder = i
+                CategoryTitle = $"Category {i}",
+                CategorySortOrder = i
             });
         }
 
@@ -34,7 +34,7 @@ namespace Jeopardy.Controllers
                 answers.Add(new AnswerViewModel() {
                     AnswerId = i,
                     AnswerValue = i * 100,
-                    Answer = $"This is answer {i} in {category.CategoryName}"
+                    AnswerText = $"This is answer {i} in {category.CategoryTitle}"
                 });
             }
             category.Answers = answers;
@@ -42,7 +42,7 @@ namespace Jeopardy.Controllers
 
         var game = new GameViewModel() {
             GameId = 1,
-            GameName = "Test Game",
+            GameTitle = "Test Game",
             Categories = categories
         };
 

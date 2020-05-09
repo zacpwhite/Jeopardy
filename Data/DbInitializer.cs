@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Jeopardy.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Jeopardy.Data
@@ -9,11 +10,18 @@ namespace Jeopardy.Data
     {
         public static void Initialize(JeopardyContext context, ILogger<Program> logger)
         {
-            logger.LogInformation("Ensuring Database Deleted");
-            context.Database.EnsureDeleted();
+            logger.LogInformation("Migrating database");
+            context.Database.Migrate();
 
-            logger.LogInformation("Ensuring Database Created");
-            context.Database.EnsureCreated();
+            logger.LogInformation("Checking for Seed data");
+
+            if (context.Games.Any()) 
+            {
+                logger.LogInformation("Database already seeded");
+                return;
+            }
+
+            logger.LogInformation("Seeding database");
 
             //Create Demo Game
             logger.LogInformation("Creating Game");

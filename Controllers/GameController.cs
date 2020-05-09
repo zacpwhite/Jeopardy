@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Jeopardy.Controllers
 {
-    [Route("Game")]
+    [Route("[controller]")]
     public class GameController : Controller
     {
         private ILogger<GameController> _logger;
@@ -30,41 +30,36 @@ namespace Jeopardy.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int? gameId = 1, int? round = 0)
+        [HttpGet("{gameId}/{round}")]
+        public async Task<IActionResult> Index(int gameId, int round)
         {
             try
             {
-                if (gameId == null)
-                {
-                    throw new ArgumentNullException(nameof(gameId));
-                }
-
-                if (round == null)
-                {
-                    throw new ArgumentNullException(nameof(round));
-                }
-
                 var game = await _context.Games
                     .Include(x => x.Categories)
                     .ThenInclude(x => x.Answers)
+                    .ThenInclude(x => x.Questions)
                     .AsNoTracking()
-                    .Select(g => new Game {
+                    .Select(g => new Game
+                    {
                         GameId = g.GameId,
                         GameDescription = g.GameDescription,
                         GameTitle = g.GameTitle,
+                        CurrentRound = (Round)round,
                         Categories = g.Categories
                             .Where(c => c.Round == (Round)round)
-                            .Select(c => new Category{
+                            .Select(c => new Category
+                            {
                                 CategoryId = c.CategoryId,
                                 CategoryDescription = c.CategoryDescription,
                                 CategorySortOrder = c.CategorySortOrder,
                                 CategoryTitle = c.CategoryTitle,
                                 Answers = c.Answers.OrderBy(a => a.AnswerValue).ToList()
                             }).OrderBy(c => c.CategorySortOrder).ToList()
-                        })
+                    })
                     .FirstOrDefaultAsync(x => x.GameId == gameId);
 
-                if (game == null) 
+                if (game == null)
                 {
                     _logger.LogWarning($"Game with id {gameId} for round {round} not found");
                     return NotFound();
@@ -75,10 +70,52 @@ namespace Jeopardy.Controllers
                 return View(gameVM);
 
             }
-            catch (ArgumentNullException argEx)
+            catch (Exception ex)
             {
-                _logger.LogError(argEx, $"Invalid parameter passed to method {MethodBase.GetCurrentMethod().Name}");
-                return BadRequest();
+                _logger.LogError(ex, $"An exception occurred in {MethodBase.GetCurrentMethod().Name}");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("{gameId}.{format?}"), FormatFilter]
+        public async Task<IActionResult> Template(int gameId)
+        {
+            try
+            {
+                var game = await _context.Games
+                    .Include(x => x.Categories)
+                    .ThenInclude(x => x.Answers)
+                    .AsNoTracking()
+                    .Select(g => new Game
+                    {
+                        GameId = g.GameId,
+                        GameDescription = g.GameDescription,
+                        GameTitle = g.GameTitle,
+                        Categories = g.Categories
+                            .Select(c => new Category
+                            {
+                                CategoryId = c.CategoryId,
+                                CategoryDescription = c.CategoryDescription,
+                                CategorySortOrder = c.CategorySortOrder,
+                                CategoryTitle = c.CategoryTitle,
+                                Answers = c.Answers
+                                    .Select(a => new Answer{
+                                        AnswerId = a.AnswerId,
+                                        AnswerText = a.AnswerText,
+                                        AnswerValue = a.AnswerValue,
+                                        Questions = a.Questions.OrderBy(q => q.QuestionId).ToList()
+                                    }).OrderBy(a => a.AnswerValue).ToList()
+                            }).OrderBy(c => c.CategorySortOrder).ToList()
+                    })
+                    .FirstOrDefaultAsync(x => x.GameId == gameId);
+
+                if (game == null)
+                {
+                    _logger.LogWarning($"Game with id {gameId} not found");
+                    return NotFound();
+                }
+
+                return Ok(game);
             }
             catch (Exception ex)
             {

@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
 
 namespace Jeopardy
 {
@@ -34,7 +35,9 @@ namespace Jeopardy
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson()
+                .AddXmlSerializerFormatters();
 
             services.AddDbContext<JeopardyContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))

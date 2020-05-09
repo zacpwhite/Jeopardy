@@ -80,6 +80,8 @@ namespace Jeopardy.Data
 
             logger.LogInformation("Creating Answers");
 
+            categories = categories.OrderBy(x => x.CategoryId).ToList();
+
             var answers = new List<Answer>();
 
             for (var i = 0; i < categories.Count(); i++)
@@ -118,6 +120,8 @@ namespace Jeopardy.Data
 
             logger.LogInformation("Creating Questions");
 
+            answers = answers.OrderBy(x => x.AnswerId).ToList();
+
             var questions = new List<Question>();
 
             for (var i = 0; i < answers.Count(); i++)
@@ -128,7 +132,7 @@ namespace Jeopardy.Data
                     {
                         questions.Add(new Question
                         {
-                            QuestionText = $"What is ${answers[i].AnswerValue}?",
+                            QuestionText = $"What is ${answers[i].AnswerValue * (j % 3 == 0 ? 1 : j + 4)}?",
                             IsCorrect = (j % 3 == 0 ? true : false),
                             AnswerId = i + 1
                         });

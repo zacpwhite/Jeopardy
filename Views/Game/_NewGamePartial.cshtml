@@ -1,0 +1,37 @@
+@model NewGameViewModel
+
+<div class="modal fade" id="newgame-modal" tabindex="-1" role="dialog" aria-labelledby="newGameLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newGameLabel">New Game</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Game" asp-action="Create" method="Post">
+                    <div class="form-group">
+                        <label asp-for="GameTitle"></label>
+                        <input asp-for="GameTitle" class="form-control" />
+                        <span asp-validation-for="GameTitle" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="GameDescription"></label>
+                        <input asp-for="GameDescription" class="form-control" />
+                        <span asp-validation-for="GameDescription" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Username"></label>
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-save="newgame-modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

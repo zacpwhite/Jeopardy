@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Jeopardy.Controllers
 {
-    [Route("[controller]")]
     public class GameController : Controller
     {
         private ILogger<GameController> _logger;
@@ -30,7 +29,7 @@ namespace Jeopardy.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{gameId}/{round}")]
+        [HttpGet]
         public async Task<IActionResult> Index(int gameId, int round)
         {
             try
@@ -99,7 +98,8 @@ namespace Jeopardy.Controllers
                                 CategorySortOrder = c.CategorySortOrder,
                                 CategoryTitle = c.CategoryTitle,
                                 Answers = c.Answers
-                                    .Select(a => new Answer{
+                                    .Select(a => new Answer
+                                    {
                                         AnswerId = a.AnswerId,
                                         AnswerText = a.AnswerText,
                                         AnswerValue = a.AnswerValue,
@@ -116,6 +116,38 @@ namespace Jeopardy.Controllers
                 }
 
                 return Ok(game);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An exception occurred in {MethodBase.GetCurrentMethod().Name}");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            var newGameVM = new NewGameViewModel();
+            return PartialView("_NewGamePartial", newGameVM);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(NewGameViewModel newGameViewModel)
+        {
+            try
+            {
+                var game = _mapper.Map<Game>(newGameViewModel);
+                var user = _mapper.Map<User>(newGameViewModel);
+
+                _context.Games.Add(game);
+                await _context.SaveChangesAsync();
+
+                user.GameId = game.GameId;
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                return Ok();
             }
             catch (Exception ex)
             {

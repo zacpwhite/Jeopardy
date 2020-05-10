@@ -4,5 +4,42 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Want to play a <a href="/game">new game</a>?</p>
+    <p><a id="createGameLink" href="#">Create</a> a new game</p>
+    <p>or</p>
+    <p><a id="joinGameLink" href="#">Join</a> an exiting game</p>
 </div>
+
+<div id="gameModal-placeholder"></div>
+
+@section Scripts {
+    <script type="text/javascript">
+        (function($){
+            $(document).ready(function(e){
+                var $createNewGame = $("#createGameLink");
+                var $joinGameLink = $("#joinGameLink");
+                var $gameModal = $("#gameModal-placeholder");
+                var newGameUrl = '/game/create';
+                var joinGameUrl = '/game/join';
+
+                $createNewGame.click(function(event){
+                    event.preventDefault();
+                    $.get(newGameUrl).done(function (data) {
+                        $gameModal.html(data);
+                        $gameModal.find('.modal').modal('show');
+                    });
+                });
+
+                $gameModal.on('click', '[data-save="newgame-modal"]', function(event){
+                    event.preventDefault();
+                    var $form = $(this).parents('.modal').find('form');
+                    var actionUrl = $form.attr('action');
+                    var formData = $form.serialize();
+
+                    $.post(actionUrl, formData).done(function(response){
+                        $gameModal.find('.modal').modal('hide');
+                    });
+                });
+            });
+        }(jQuery));
+    </script>
+}

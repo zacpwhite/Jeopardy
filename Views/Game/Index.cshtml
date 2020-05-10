@@ -38,11 +38,11 @@
                 $('a[data-toggle="answer-modal"]').click(function(e){
                     e.preventDefault();
                     var $this = $(this);
-                    var modalPlaceholder = $('#modal-placeholder');
+                    var $modalPlaceholder = $('#modal-placeholder');
                     var answerId = $this.data('answerid');
-                    var url = `/Answer/${answerId}`;
+                    var url = `~/Answer/${answerId}`;
 
-                    modalPlaceholder.on('hide.bs.modal', function (e) {
+                    $modalPlaceholder.on('hide.bs.modal', function (e) {
                         $.post(`${url}/complete`).done(function(data){
                             $this.removeClass('text-warning');
                             $this.addClass('text-primary');
@@ -51,8 +51,8 @@
                     });
 
                     $.get(url).done(function (data) {
-                        modalPlaceholder.html(data);
-                        modalPlaceholder.find('.modal').modal('show');
+                        $modalPlaceholder.html(data);
+                        $modalPlaceholder.find('.modal').modal('show');
                     });
                 });
             });

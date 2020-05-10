@@ -15,6 +15,8 @@ namespace Jeopardy.Data {
 
         public DbSet<Question> Questions { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("dbo");
@@ -22,6 +24,7 @@ namespace Jeopardy.Data {
             modelBuilder.Entity<Category>().ToTable("Categories");
             modelBuilder.Entity<Answer>().ToTable("Answers");
             modelBuilder.Entity<Question>().ToTable("Questions");
+            modelBuilder.Entity<User>().ToTable("Users");
         }
     }
 }

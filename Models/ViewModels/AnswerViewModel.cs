@@ -6,5 +6,7 @@ namespace Jeopardy.Models.ViewModels {
         public int AnswerValue { get; set; }
 
         public string AnswerText { get; set; }
+
+        public bool HasBeenRead { get; set; }
     }
 }

@@ -35,8 +35,38 @@ namespace Jeopardy.Controllers
             try
             {
                 var answer = await _context.Answers.FirstOrDefaultAsync(x => x.AnswerId == id);
+
+                if (answer == null)
+                {
+                    return NotFound();
+                }
+
                 var answerVM = _mapper.Map<AnswerViewModel>(answer);
                 return PartialView("_AnswerPartial", answerVM);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An exception occurred in {MethodBase.GetCurrentMethod().Name}");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPost("{id}/complete")]
+        public async Task<IActionResult> Complete(int id)
+        {
+            try
+            {
+                var answer = await _context.Answers.FirstOrDefaultAsync(x => x.AnswerId == id);
+
+                if (answer == null) {
+                    return NotFound();
+                }
+
+                answer.HasBeenRead = true;
+                _context.Update(answer);
+                await _context.SaveChangesAsync();
+
+                return Ok();
             }
             catch (Exception ex)
             {

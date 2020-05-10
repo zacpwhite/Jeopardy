@@ -10,6 +10,8 @@ namespace Jeopardy.Models
 
         public string AnswerText { get; set; }
 
+        public bool HasBeenRead { get; set; }
+
         public int CategoryId { get; set; }
 
         public Category Category { get; set; }

@@ -1,0 +1,16 @@
+@model AnswerViewModel
+
+<div class="modal fade" id="answer-modal" tabindex="-1" role="dialog" aria-labelledby="answerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content bg-primary text-white">
+            <div class="modal-body">
+                <h2 class="text-center py-5">
+                    @Model.AnswerText
+                </h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

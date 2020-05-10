@@ -13,7 +13,7 @@
                     @if (a == -1) {
                         @Model.Categories[c].CategoryTitle
                     } else {
-                        <a href="#" class="text-warning">
+                        <a href="#" class="text-warning" data-toggle="answer-modal" data-answerid="@(Model.Categories[c].Answers[a].AnswerId)">
                             @($"${Model.Categories[c].Answers[a].AnswerValue}")
                         </a>
                     }
@@ -21,4 +21,31 @@
             </div>      
         }
     </div>
+}
+
+<div id="modal-placeholder"></div>
+
+@section Scripts {
+    <script type="text/javascript">
+        (function($){
+            $(document).ready(function(){
+                $('a[data-toggle="answer-modal"]').click(function(e){
+                    e.preventDefault();
+                    var $this = $(this);
+                    var modalPlaceholder = $('#modal-placeholder');
+
+                    modalPlaceholder.on('hide.bs.modal', function (e) {
+                        $this.hide();
+                    });
+
+                    var answerId = $this.data('answerid');
+                    var url = `/Answer/${answerId}`;
+                    $.get(url).done(function (data) {
+                        modalPlaceholder.html(data);
+                        modalPlaceholder.find('.modal').modal('show');
+                    });
+                });
+            });
+        })(jQuery);
+    </script>
 }

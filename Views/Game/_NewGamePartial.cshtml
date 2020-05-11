@@ -11,6 +11,7 @@
             </div>
             <div class="modal-body">
                 <form asp-controller="Game" asp-action="Create" method="Post">
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
                     <div class="form-group">
                         <label asp-for="GameTitle"></label>
                         <input asp-for="GameTitle" class="form-control" />
@@ -30,7 +31,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-save="newgame-modal">Save</button>
+                <button type="button" class="btn btn-primary" data-save="modal">Save</button>
             </div>
         </div>
     </div>

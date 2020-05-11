@@ -30,7 +30,7 @@ namespace Jeopardy.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int gameId, int round)
+        public async Task<IActionResult> Index(int id)
         {
             try
             {
@@ -44,9 +44,9 @@ namespace Jeopardy.Controllers
                         GameId = g.GameId,
                         GameDescription = g.GameDescription,
                         GameTitle = g.GameTitle,
-                        CurrentRound = (Round)round,
+                        CurrentRound = Round.Jeopardy,
                         Categories = g.Categories
-                            .Where(c => c.Round == (Round)round)
+                            .Where(c => c.Round == Round.Jeopardy)
                             .Select(c => new Category
                             {
                                 CategoryId = c.CategoryId,
@@ -56,11 +56,11 @@ namespace Jeopardy.Controllers
                                 Answers = c.Answers.OrderBy(a => a.AnswerValue).ToList()
                             }).OrderBy(c => c.CategorySortOrder).ToList()
                     })
-                    .FirstOrDefaultAsync(x => x.GameId == gameId);
+                    .FirstOrDefaultAsync(x => x.GameId == id);
 
                 if (game == null)
                 {
-                    _logger.LogWarning($"Game with id {gameId} for round {round} not found");
+                    _logger.LogWarning($"Game with id {id} for round {Round.Jeopardy} not found");
                     return NotFound();
                 }
 
@@ -133,21 +133,24 @@ namespace Jeopardy.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Create(NewGameViewModel newGameViewModel)
         {
             try
             {
-                var game = _mapper.Map<Game>(newGameViewModel);
-                var user = _mapper.Map<User>(newGameViewModel);
+                if (ModelState.IsValid)
+                {
+                    var game = _mapper.Map<Game>(newGameViewModel);
+                    var user = _mapper.Map<User>(newGameViewModel);
 
-                _context.Games.Add(game);
-                await _context.SaveChangesAsync();
+                    _context.Games.Add(game);
+                    await _context.SaveChangesAsync();
 
-                user.GameId = game.GameId;
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-
-                return Ok();
+                    user.GameId = game.GameId;
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                }
+                return PartialView("_NewGamePartial", newGameViewModel);
             }
             catch (Exception ex)
             {

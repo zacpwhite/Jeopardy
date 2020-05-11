@@ -29,7 +29,6 @@ namespace Jeopardy.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id}")]
         public async Task<IActionResult> Index(int id)
         {
             try
@@ -51,7 +50,7 @@ namespace Jeopardy.Controllers
             }
         }
 
-        [HttpPost("{id}/complete")]
+        [HttpPost]
         public async Task<IActionResult> Complete(int id)
         {
             try

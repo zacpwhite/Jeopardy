@@ -18,7 +18,7 @@
                                 @($"${Model.Categories[c].Answers[a].AnswerValue}")    
                             </span>
                         } else {
-                            <a href="#" class="text-warning" data-toggle="answer-modal" data-answerid="@(Model.Categories[c].Answers[a].AnswerId)">
+                            <a href="#" class="text-warning" data-url='@Url.Action("Index", "Answer", new {id = Model.Categories[c].Answers[a].AnswerId})' data-toggle="modal" data-answerid="@(Model.Categories[c].Answers[a].AnswerId)">
                                 @($"${Model.Categories[c].Answers[a].AnswerValue}")
                             </a>
                         }
@@ -35,24 +35,17 @@
     <script type="text/javascript">
         (function($){
             $(document).ready(function(){
-                $('a[data-toggle="answer-modal"]').click(function(e){
-                    e.preventDefault();
-                    var $this = $(this);
-                    var $modalPlaceholder = $('#modal-placeholder');
-                    var answerId = $this.data('answerid');
-                    var url = `~/Answer/${answerId}`;
-
+                var $modalPlaceholder = $('#modal-placeholder');
+                $modalPlaceholder.on('show.bs.modal', function(e){
+                    var answerId = $modalPlaceholder.find('div[data-answerid]').data('answerid');
+                    var $answerLink = $(`a[data-answerid="${answerId}"]`);
+                    var answerUrl = $modalPlaceholder.find('div[data-answerid]').data('url');
                     $modalPlaceholder.on('hide.bs.modal', function (e) {
-                        $.post(`${url}/complete`).done(function(data){
-                            $this.removeClass('text-warning');
-                            $this.addClass('text-primary');
-                            $this.removeAttr('href');
+                        $.post(answerUrl).done(function(response){
+                            $answerLink.removeClass('text-warning');
+                            $answerLink.addClass('text-primary');
+                            $answerLink.removeAttr('href');
                         });
-                    });
-
-                    $.get(url).done(function (data) {
-                        $modalPlaceholder.html(data);
-                        $modalPlaceholder.find('.modal').modal('show');
                     });
                 });
             });

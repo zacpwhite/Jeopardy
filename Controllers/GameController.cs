@@ -133,7 +133,6 @@ namespace Jeopardy.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Create(NewGameViewModel newGameViewModel)
         {
             try

@@ -17,12 +17,17 @@
             $(document).ready(function(){
                 var $modalPlaceholder = $('#modal-placeholder');
 
-                $modalPlaceholder.on('show.bs.modal', function(e){
+                $modalPlaceholder.on('show.bs.modal', function(e){ 
+                    var $joinGameModal = $modalPlaceholder.find('#joingame-modal');
+                    if (!$joinGameModal.length) {
+                        return;
+                    }
                     var $gameTitle = $modalPlaceholder.find('#gameTitle');
                     var $gameId = $modalPlaceholder.find('#gameId');
                     var $username = $modalPlaceholder.find('#Username');
                     var $form = $modalPlaceholder.find('form');
                     var url = $gameTitle.data('url');
+                    var gameId;
 
                     $gameTitle.autocomplete({
                         minLength: 2,
@@ -50,15 +55,13 @@
                         if ($.trim($gameTitle.val()) == '') {
                             $gameId.val(0);
                         }
+                        gameId = $gameId.val();
                         $form.validate().element($gameId);
                     });
 
                     $username.keyup(function(e){
                         e.preventDefault();
                         $form.validate().element($username);
-                    });
-
-                    $modalPlaceholder.on('hide.bs.modal', function (e) {
                     });
                 });
             });

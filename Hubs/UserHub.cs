@@ -1,6 +1,8 @@
+using System.Threading.Tasks;
 using AutoMapper;
 using Jeopardy.Data;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Jeopardy.Hubs
@@ -18,6 +20,18 @@ namespace Jeopardy.Hubs
             _logger = logger;
             _context = context;
             _mapper = mapper;
+        }
+
+        public async Task UserJoined(string userId, string gameId)
+        {
+            int userIdInt;
+            int gameIdInt;
+            int.TryParse(userId, out userIdInt);
+            int.TryParse(gameId, out gameIdInt);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.Equals(userIdInt) && x.GameId.Equals(gameIdInt));
+            if (user != null) {
+                await Clients.All.SendAsync("userJoined", user.UserId, user.Username);
+            }
         }
     }
 }

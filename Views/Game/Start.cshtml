@@ -1,0 +1,57 @@
+@model GameViewModel
+
+<h2 class="text-center">@Model.GameTitle</h2>
+<h3 class="text-center">@Model.GameDescription</h3>
+
+<div class="row" id="usersList">
+    
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        (function($){
+            $(document).ready(function(e){
+                var $usersList = $('#usersList');
+
+                var connection = new signalR.HubConnectionBuilder()
+                    .withUrl('/userhub')
+                    .build();
+
+                connection.on('userJoined', function(userId, userName){
+                    var $user = $usersList.find(`[data-userid="${userId}"]`);
+                    if (!$user.length) {
+                        $usersList.append(`<div class="col-xs-2 bg-info text-white" data-userid="${userId}"><h3 class="text-center">${userName}</h3></div>`);
+                    }
+                });
+
+                connection.start()
+                    .then(function(){
+                        var userId = getCookie('userId');
+                        var gameId = '@(Model.GameId)';
+                        console.log(`UserID: ${userId}`);
+                        if (userId != '') {
+                            connection.invoke('UserJoined', userId, gameId);
+                        }
+                    }).catch(error => {
+                        console.error(error.message);
+                    });
+            });
+
+            function getCookie(cname) {
+                var name = cname + "=";
+                var decodedCookie = decodeURIComponent(document.cookie);
+                var ca = decodedCookie.split(';');
+                for(var i = 0; i <ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
+        }(jQuery))
+    </script>
+}

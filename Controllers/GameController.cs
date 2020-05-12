@@ -30,7 +30,42 @@ namespace Jeopardy.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int id)
+        public async Task<IActionResult> Start(int id)
+        {
+            try
+            {
+                var userIdString = Request.Cookies["userId"];
+                if (!string.IsNullOrEmpty(userIdString))
+                {
+                    int userId;
+                    int.TryParse(userIdString, out userId);
+                    var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.Equals(userId));
+                    if (user == null)
+                    {
+                        Response.Redirect(Url.Action("Index", "Home"));
+                    }
+                }
+
+                var game = await _context.Games.FirstOrDefaultAsync(x => x.GameId.Equals(id));
+
+                if (game == null)
+                {
+                    return NotFound();
+                }
+
+                var gameVM = _mapper.Map<GameViewModel>(game);
+
+                return View("Start", gameVM);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An exception occurred in {MethodBase.GetCurrentMethod().Name}");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Play(int id)
         {
             try
             {
@@ -149,6 +184,14 @@ namespace Jeopardy.Controllers
                     user.UserIsHost = true;
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
+
+                    var cookieOptions = new CookieOptions
+                    {
+                        Expires = DateTime.UtcNow.AddHours(1)
+                    };
+
+                    Response.Cookies.Append("userId", user.UserId.ToString(), cookieOptions);
+                    //Response.Redirect(Url.Action("Start", "Game", new {id = game.GameId}));
                 }
                 return PartialView("_NewGamePartial", newGameVM);
             }
@@ -206,12 +249,22 @@ namespace Jeopardy.Controllers
                         return NotFound();
                     }
 
-                    var user = new User() {
-                        Username = joinGameVM.Username
+                    var user = new User()
+                    {
+                        Username = joinGameVM.Username,
+                        GameId = game.GameId
                     };
 
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
+
+                    var cookieOptions = new CookieOptions
+                    {
+                        Expires = DateTime.UtcNow.AddHours(1)
+                    };
+
+                    Response.Cookies.Append("userId", user.UserId.ToString(), cookieOptions);
+                    //Response.Redirect(Url.Action("Start", "Game", new {id=game.GameId}));
                 }
 
                 return PartialView("_JoinGamePartial", joinGameVM);

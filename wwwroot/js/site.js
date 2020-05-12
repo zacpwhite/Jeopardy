@@ -14,6 +14,8 @@
             $.get(url).done(function (data) {
                 $modalPlaceholder.html(data);
                 $modalPlaceholder.find('.modal').modal('show');
+                var $form = $modalPlaceholder.find('form');
+                $.validator.unobtrusive.parse($form);
             });
         });
 

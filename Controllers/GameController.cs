@@ -133,23 +133,88 @@ namespace Jeopardy.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(NewGameViewModel newGameViewModel)
+        public async Task<IActionResult> Create(NewGameViewModel newGameVM)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    var game = _mapper.Map<Game>(newGameViewModel);
-                    var user = _mapper.Map<User>(newGameViewModel);
+                    var game = _mapper.Map<Game>(newGameVM);
+                    var user = _mapper.Map<User>(newGameVM);
 
                     _context.Games.Add(game);
                     await _context.SaveChangesAsync();
 
                     user.GameId = game.GameId;
+                    user.UserIsHost = true;
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
                 }
-                return PartialView("_NewGamePartial", newGameViewModel);
+                return PartialView("_NewGamePartial", newGameVM);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An exception occurred in {MethodBase.GetCurrentMethod().Name}");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("search")]
+        [Produces("application/json")]
+        public async Task<IActionResult> Search()
+        {
+            try
+            {
+                string term = HttpContext.Request.Query["term"].ToString();
+
+                var games = await _context.Games
+                    .Where(x => x.GameTitle.Contains(term))
+                    .Select(x => new
+                    {
+                        gameId = x.GameId,
+                        gameTitle = x.GameTitle
+                    }).ToListAsync();
+
+                return Ok(games);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An exception occurred in {MethodBase.GetCurrentMethod().Name}");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Join()
+        {
+            var joinGameVM = new JoinGameViewModel();
+            return PartialView("_JoinGamePartial", joinGameVM);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Join(JoinGameViewModel joinGameVM)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var game = await _context.Games.FirstOrDefaultAsync(x => x.GameId.Equals(joinGameVM.GameId));
+
+                    if (game == null)
+                    {
+                        return NotFound();
+                    }
+
+                    var user = new User() {
+                        Username = joinGameVM.Username
+                    };
+
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                }
+
+                return PartialView("_JoinGamePartial", joinGameVM);
             }
             catch (Exception ex)
             {

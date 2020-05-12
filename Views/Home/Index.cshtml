@@ -6,7 +6,62 @@
     <h1 class="display-4">Welcome</h1>
     <p><a href="#" data-toggle="modal" data-url='@Url.Action("Create", "Game")'>Create</a> a new game</p>
     <p>or</p>
-    <p><a id="joinGameLink" href="#">Join</a> an exiting game</p>
+    <p><a href="#" data-toggle="modal" data-url='@Url.Action("Join", "Game")'>Join</a> an existing game</p>
 </div>
 
 <div id="modal-placeholder"></div>
+
+@section Scripts {
+    <script type="text/javascript">
+        (function($){
+            $(document).ready(function(){
+                var $modalPlaceholder = $('#modal-placeholder');
+
+                $modalPlaceholder.on('show.bs.modal', function(e){
+                    var $gameTitle = $modalPlaceholder.find('#gameTitle');
+                    var $gameId = $modalPlaceholder.find('#gameId');
+                    var $username = $modalPlaceholder.find('#Username');
+                    var $form = $modalPlaceholder.find('form');
+                    var url = $gameTitle.data('url');
+
+                    $gameTitle.autocomplete({
+                        minLength: 2,
+                        source: url,
+                        focus: function(event, ui) {
+                            $gameTitle.val(ui.item.gameTitle);
+                            return false;
+                        },
+                        select: function(event, ui) {
+                            event.preventDefault();
+                            $gameTitle.val(ui.item.gameTitle);
+                            $gameId.val(ui.item.gameId);
+                            return false;
+                        },
+                        close: function() {
+                            $(this).blur();
+                        }
+                    }).autocomplete("instance")._renderItem = function(ul, item) {
+                        return $("<li>")
+                            .append(`<div>${item.gameTitle}</div>`)
+                            .appendTo(ul);
+                    };
+
+                    $gameTitle.blur(function(e){
+                        if ($.trim($gameTitle.val()) == '') {
+                            $gameId.val(0);
+                        }
+                        $form.validate().element($gameId);
+                    });
+
+                    $username.keyup(function(e){
+                        e.preventDefault();
+                        $form.validate().element($username);
+                    });
+
+                    $modalPlaceholder.on('hide.bs.modal', function (e) {
+                    });
+                });
+            });
+        })(jQuery);
+    </script>
+}

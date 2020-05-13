@@ -15,6 +15,14 @@
     <script type="text/javascript">
         (function($){
             $(document).ready(function(){
+                var user = getCookieObj("user");
+                if (user != null) {
+                    var gameId = user["gameId"];
+                    if (gameId != null) {
+                        window.location = `/game/start/${gameId}`;
+                    }
+                }
+
                 var $modalPlaceholder = $('#modal-placeholder');
 
                 $modalPlaceholder.on('show.bs.modal', function(e){ 

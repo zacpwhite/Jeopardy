@@ -1,6 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Jeopardy.Data;
+using Jeopardy.Models;
+using Jeopardy.Models.ViewModels;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -9,6 +14,8 @@ namespace Jeopardy.Hubs
 {
     public class UserHub : Hub 
     {
+        static List<ConnectedUser> _connectedUsers = new List<ConnectedUser>();
+
         private ILogger<UserHub> _logger;
 
         private JeopardyContext _context;
@@ -22,15 +29,34 @@ namespace Jeopardy.Hubs
             _mapper = mapper;
         }
 
-        public async Task UserJoined(string userId, string gameId)
+        public override async Task OnDisconnectedAsync(Exception exception) 
+        {   
+            var user = _connectedUsers.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+            if (user != null) {
+                _connectedUsers.Remove(user);
+            }
+            await Groups.RemoveFromGroupAsync(user.ConnectionId, user.GameId.ToString());
+            await Clients.Group(user.GameId.ToString()).SendAsync("refreshUsersList", _connectedUsers.Where(x => x.GameId.Equals(user.GameId)).ToArray());
+            await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task UserJoined(string userId)
         {
             int userIdInt;
-            int gameIdInt;
             int.TryParse(userId, out userIdInt);
-            int.TryParse(gameId, out gameIdInt);
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.Equals(userIdInt) && x.GameId.Equals(gameIdInt));
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.Equals(userIdInt));
             if (user != null) {
-                await Clients.All.SendAsync("userJoined", user.UserId, user.Username);
+                var connectedUser = new ConnectedUser {
+                    UserId = user.UserId,
+                    UserName = user.Username,
+                    ConnectionId = Context.ConnectionId,
+                    IsHost = user.UserIsHost,
+                    GameId = user.GameId
+                };
+
+                _connectedUsers.Add(connectedUser);
+                await Groups.AddToGroupAsync(connectedUser.ConnectionId, user.GameId.ToString());
+                await Clients.Group(user.GameId.ToString()).SendAsync("refreshUsersList", _connectedUsers.Where(x => x.GameId.Equals(user.GameId)).ToArray());
             }
         }
     }

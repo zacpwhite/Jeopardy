@@ -191,7 +191,7 @@ namespace Jeopardy.Controllers
                     };
 
                     Response.Cookies.Append("userId", user.UserId.ToString(), cookieOptions);
-                    //Response.Redirect(Url.Action("Start", "Game", new {id = game.GameId}));
+                    return Ok(Url.Action("Start", "Game", new {id=game.GameId}));
                 }
                 return PartialView("_NewGamePartial", newGameVM);
             }
@@ -264,7 +264,7 @@ namespace Jeopardy.Controllers
                     };
 
                     Response.Cookies.Append("userId", user.UserId.ToString(), cookieOptions);
-                    //Response.Redirect(Url.Action("Start", "Game", new {id=game.GameId}));
+                    return Ok(Url.Action("Start", "Game", new {id=game.GameId}));
                 }
 
                 return PartialView("_JoinGamePartial", joinGameVM);

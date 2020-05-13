@@ -17,20 +17,22 @@
                     .withUrl('/userhub')
                     .build();
 
-                connection.on('userJoined', function(userId, userName){
-                    var $user = $usersList.find(`[data-userid="${userId}"]`);
-                    if (!$user.length) {
-                        $usersList.append(`<div class="col-xs-2 bg-info text-white" data-userid="${userId}"><h3 class="text-center">${userName}</h3></div>`);
-                    }
+                connection.on('refreshUsersList', function(users){
+                    $usersList.find('[data-userid]').remove();
+                    $.map(users, function(user){
+                        var $user = $usersList.find(`[data-userid="${user["userId"]}"]`);
+                        if (!$user.length > 0) {
+                            console.log(user);
+                            $usersList.append(`<div class="col-xs-2 ${user["isHost"] == true ? "bg-success" : "bg-primary"} text-white p-5 border border-white rounded" data-userid="${user["userId"]}"><h3 class="text-center">${user["userName"]}</h3></div>`);
+                        }
+                    });
                 });
 
                 connection.start()
                     .then(function(){
                         var userId = getCookie('userId');
-                        var gameId = '@(Model.GameId)';
-                        console.log(`UserID: ${userId}`);
                         if (userId != '') {
-                            connection.invoke('UserJoined', userId, gameId);
+                            connection.invoke('UserJoined', userId);
                         }
                     }).catch(error => {
                         console.error(error.message);

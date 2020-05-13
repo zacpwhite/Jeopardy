@@ -25,12 +25,12 @@
             var actionUrl = $form.attr('action');
             var formData = $form.serialize();
             $.post(actionUrl, formData).done(function(response){
-                var responseHtml = $('.modal-body', response);
-                var isValid = responseHtml.find('[name="IsValid"]').val() == 'True';
-                if (isValid) {
-                    $modalPlaceholder.find('.modal').modal('hide');
+                if (response.indexOf('<div') > -1) {
+                    var responseHtml = $('.modal-body', response);
+                    $modalPlaceholder.find('.modal-body').replaceWith(responseHtml); 
                 } else {
-                    $modalPlaceholder.find('.modal-body').replaceWith(responseHtml);
+                    $modalPlaceholder.find('.modal').modal('hide');
+                    window.location.href = response;
                 }
             });
         });

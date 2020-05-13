@@ -11,7 +11,6 @@
             </div>
             <div class="modal-body">
                 <form asp-controller="Game" asp-action="Join" method="Post">
-                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
                     <div class="form-group">
                         <label>Game Title</label>
                         <input id="gameTitle" data-url='@Url.Action("Search", "Game")' class="form-control" />

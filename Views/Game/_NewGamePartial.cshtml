@@ -11,7 +11,6 @@
             </div>
             <div class="modal-body">
                 <form asp-controller="Game" asp-action="Create" method="Post">
-                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
                     <div class="form-group">
                         <label asp-for="GameTitle"></label>
                         <input asp-for="GameTitle" class="form-control" />

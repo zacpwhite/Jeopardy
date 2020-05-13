@@ -36,3 +36,13 @@
         });
     });
 }(jQuery));
+
+var setCookieObj = function(key, value) {
+    $.cookie(key, btoa(JSON.stringify(value)));
+}
+
+var getCookieObj = function (key) {
+    var cookie = $.cookie(key);
+    if (typeof cookie === "undefined") return null;
+    return JSON.parse(atob(cookie));
+}

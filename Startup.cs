@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Jeopardy
@@ -37,8 +38,9 @@ namespace Jeopardy
             services.AddSingleton(mapper);
 
             services.AddControllersWithViews()
-                .AddNewtonsoftJson()
-                .AddXmlSerializerFormatters();
+                .AddNewtonsoftJson(options => {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                });
 
             services.AddDbContext<JeopardyContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))

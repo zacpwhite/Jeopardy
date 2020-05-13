@@ -40,11 +40,9 @@ namespace Jeopardy.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task UserJoined(string userId)
+        public async Task UserJoined(int userId)
         {
-            int userIdInt;
-            int.TryParse(userId, out userIdInt);
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.Equals(userIdInt));
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.Equals(userId));
             if (user != null) {
                 var connectedUser = new ConnectedUser {
                     UserId = user.UserId,

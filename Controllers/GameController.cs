@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Jeopardy.Utilities;
+using Newtonsoft.Json;
 
 namespace Jeopardy.Controllers
 {
@@ -34,23 +36,29 @@ namespace Jeopardy.Controllers
         {
             try
             {
-                var userIdString = Request.Cookies["userId"];
-                if (!string.IsNullOrEmpty(userIdString))
+                var userCookieString = Request.Cookies["user"];
+                if (string.IsNullOrEmpty(userCookieString))
                 {
-                    int userId;
-                    int.TryParse(userIdString, out userId);
-                    var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.Equals(userId));
-                    if (user == null)
-                    {
-                        Response.Redirect(Url.Action("Index", "Home"));
-                    }
+                    Response.Redirect(Url.Action("Index", "Home"));
+                }
+
+                var userCookie = userCookieString.FromBase64JsonString<User>();
+                if (userCookie == null)
+                {
+                    Response.Redirect(Url.Action("Index", "Home"));
+                }
+
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId.Equals(userCookie.UserId) && x.GameId.Equals(id));
+                if (user == null)
+                {
+                    Response.Redirect(Url.Action("Index", "Home"));
                 }
 
                 var game = await _context.Games.FirstOrDefaultAsync(x => x.GameId.Equals(id));
 
                 if (game == null)
                 {
-                    return NotFound();
+                    Response.Redirect(Url.Action("Index", "Home"));
                 }
 
                 var gameVM = _mapper.Map<GameViewModel>(game);
@@ -187,10 +195,10 @@ namespace Jeopardy.Controllers
 
                     var cookieOptions = new CookieOptions
                     {
-                        Expires = DateTime.UtcNow.AddHours(1)
+                        Expires = DateTime.UtcNow.AddDays(1)
                     };
 
-                    Response.Cookies.Append("userId", user.UserId.ToString(), cookieOptions);
+                    Response.Cookies.Append("user", user.ToJsonBase64String(), cookieOptions);
                     return Ok(Url.Action("Start", "Game", new {id=game.GameId}));
                 }
                 return PartialView("_NewGamePartial", newGameVM);
@@ -263,7 +271,7 @@ namespace Jeopardy.Controllers
                         Expires = DateTime.UtcNow.AddHours(1)
                     };
 
-                    Response.Cookies.Append("userId", user.UserId.ToString(), cookieOptions);
+                    Response.Cookies.Append("user", user.ToJsonBase64String(), cookieOptions);
                     return Ok(Url.Action("Start", "Game", new {id=game.GameId}));
                 }
 

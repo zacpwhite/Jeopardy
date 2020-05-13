@@ -3,9 +3,7 @@
 <h2 class="text-center">@Model.GameTitle</h2>
 <h3 class="text-center">@Model.GameDescription</h3>
 
-<div class="row" id="usersList">
-    
-</div>
+<div class="row" id="usersList"></div>
 
 @section Scripts {
     <script type="text/javascript">
@@ -30,7 +28,9 @@
 
                 connection.start()
                     .then(function(){
-                        var userId = getCookie('userId');
+                        var user = getCookieObj('user');
+                        console.log(user);
+                        var userId = user["userId"];
                         if (userId != '') {
                             connection.invoke('UserJoined', userId);
                         }
@@ -38,22 +38,6 @@
                         console.error(error.message);
                     });
             });
-
-            function getCookie(cname) {
-                var name = cname + "=";
-                var decodedCookie = decodeURIComponent(document.cookie);
-                var ca = decodedCookie.split(';');
-                for(var i = 0; i <ca.length; i++) {
-                    var c = ca[i];
-                    while (c.charAt(0) == ' ') {
-                        c = c.substring(1);
-                    }
-                    if (c.indexOf(name) == 0) {
-                        return c.substring(name.length, c.length);
-                    }
-                }
-                return "";
-            }
         }(jQuery))
     </script>
 }

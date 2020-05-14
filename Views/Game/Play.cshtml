@@ -8,23 +8,25 @@
 {
     <div class='row @(a == -1 ? "text-white" : "")'>
         @for(var c = 0; c < Model.Categories.Count(); c++) {
-            <div class="col bg-primary py-5 border border-white rounded">
-                <h2 class="text-center">
+            <div class='col bg-primary border border-white rounded text-center d-flex flex-column align-content-center'>
                     @if (a == -1) {
-                        @Model.Categories[c].CategoryTitle
+                        <h3 class='py-2'>
+                            @Model.Categories[c].CategoryTitle
+                        </h3>
                     } else {
-                        if (Model.Categories[c].Answers[a].HasBeenRead == true) {
-                            <span class="text-primary">
-                                @($"${Model.Categories[c].Answers[a].AnswerValue}")    
-                            </span>
-                        } else {
-                            <a href="#" class="text-warning" data-url='@Url.Action("Index", "Answer", new {id = Model.Categories[c].Answers[a].AnswerId})' data-toggle="modal" data-answerid="@(Model.Categories[c].Answers[a].AnswerId)">
-                                @($"${Model.Categories[c].Answers[a].AnswerValue}")
-                            </a>
-                        }
+                        <h2 class='py-5'>
+                            @if (Model.Categories[c].Answers[a].HasBeenRead == true) {
+                                <span class="text-primary">
+                                    @($"${Model.Categories[c].Answers[a].AnswerValue}")    
+                                </span>
+                            } else {
+                                <a href="#" class="text-warning" data-url='@Url.Action("Index", "Answer", new {id = Model.Categories[c].Answers[a].AnswerId})' data-toggle="modal" data-answerid="@(Model.Categories[c].Answers[a].AnswerId)">
+                                    @($"${Model.Categories[c].Answers[a].AnswerValue}")
+                                </a>
+                            }
+                        </h2>
                     }
-                </h2>
-            </div>      
+            </div>
         }
     </div>
 }
@@ -44,6 +46,21 @@
                     var answerId = $modalPlaceholder.find('div[data-answerid]').data('answerid');
                     var $answerLink = $(`a[data-answerid="${answerId}"]`);
                     var answerUrl = $modalPlaceholder.find('div[data-answerid]').data('url');
+                    var $responseBtn = $modalPlaceholder.find('[data-action="response"]');
+                    var $answerText = $modalPlaceholder.find('#answerText');
+                    var $questionText = $modalPlaceholder.find('#questionText');
+
+                    $responseBtn.click(function(e){
+                        console.log('response button click');
+                        if ($answerText.hasClass('hidden')) {
+                            $answerText.removeClass('hidden');
+                            $questionText.addClass('hidden');
+                        } else {
+                            $answerText.addClass('hidden');
+                            $questionText.removeClass('hidden');
+                        }
+                    });
+
                     $modalPlaceholder.on('hide.bs.modal', function (e) {
                         $.post(answerUrl).done(function(response){
                             $answerLink.removeClass('text-warning');
@@ -52,6 +69,8 @@
                         });
                     });
                 });
+
+                
             });
         })(jQuery);
     </script>

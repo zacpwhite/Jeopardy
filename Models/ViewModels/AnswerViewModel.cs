@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Jeopardy.Models.ViewModels {
     public class AnswerViewModel {
 
@@ -8,5 +11,9 @@ namespace Jeopardy.Models.ViewModels {
         public string AnswerText { get; set; }
 
         public bool HasBeenRead { get; set; }
+
+        public Uri ContentUri { get; set; }
+
+        public List<QuestionViewModel> Questions { get; set; }
     }
 }

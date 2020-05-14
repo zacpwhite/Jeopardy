@@ -4,11 +4,23 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content bg-primary text-white">
             <div class="modal-body">
-                <h2 class="text-center py-5">
-                    @Model.AnswerText
-                </h2>
+                @{var hasMedia = !string.IsNullOrEmpty(Model.ContentUri?.ToString());}
+                <div class='@(hasMedia == true ? "media" : "")'>
+                    @if (hasMedia) {
+                        <img src="@Model.ContentUri.ToString()" class="mr-3 img-max" />
+                    }
+                    <div class='@(hasMedia == true ? "media-body" : "")'>
+                        <h2 id="answerText" class="mt-0 text-center py-5">
+                            @Model.AnswerText
+                        </h2>
+                        <h2 id="questionText" class="mt-0 text-center py-5 hidden">
+                            @Model.Questions.FirstOrDefault().QuestionText
+                        </h2>    
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-action="response">Response</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>

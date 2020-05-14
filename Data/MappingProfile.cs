@@ -12,6 +12,7 @@ namespace Jeopardy.Models
             CreateMap<Answer, AnswerViewModel>();
             CreateMap<NewGameViewModel, Game>();
             CreateMap<NewGameViewModel, User>();
+            CreateMap<Question, QuestionViewModel>();
         }
     }
 }

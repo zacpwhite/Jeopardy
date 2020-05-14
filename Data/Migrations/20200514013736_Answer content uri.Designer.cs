@@ -3,14 +3,16 @@ using Jeopardy.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Jeopardy.Data.Migrations
 {
     [DbContext(typeof(JeopardyContext))]
-    partial class JeopardyContextModelSnapshot : ModelSnapshot
+    [Migration("20200514013736_Answer content uri")]
+    partial class Answercontenturi
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

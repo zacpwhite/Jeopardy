@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Jeopardy.Models
@@ -13,6 +14,8 @@ namespace Jeopardy.Models
         public bool HasBeenRead { get; set; }
 
         public int CategoryId { get; set; }
+
+        public Uri ContentUri { get; set; }
 
         public Category Category { get; set; }
 

@@ -33,7 +33,9 @@ namespace Jeopardy.Controllers
         {
             try
             {
-                var answer = await _context.Answers.FirstOrDefaultAsync(x => x.AnswerId == id);
+                var answer = await _context.Answers
+                    .Include(x => x.Questions)
+                    .FirstOrDefaultAsync(x => x.AnswerId == id);
 
                 if (answer == null)
                 {

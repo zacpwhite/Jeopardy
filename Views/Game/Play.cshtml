@@ -8,24 +8,22 @@
 {
     <div class='row @(a == -1 ? "text-white" : "")'>
         @for(var c = 0; c < Model.Categories.Count(); c++) {
-            <div class='col bg-primary border border-white rounded text-center d-flex flex-column align-content-center'>
+            <div class='col bg-primary border border-white rounded text-center d-flex align-items-center justify-content-center'>
+                <div class='@(a == -1 ? "h3 py-2" : "h2 py-5") d-inline-block'>
                     @if (a == -1) {
-                        <h3 class='py-2'>
-                            @Model.Categories[c].CategoryTitle
-                        </h3>
+                        @Model.Categories[c].CategoryTitle
                     } else {
-                        <h2 class='py-5'>
-                            @if (Model.Categories[c].Answers[a].HasBeenRead == true) {
-                                <span class="text-primary">
-                                    @($"${Model.Categories[c].Answers[a].AnswerValue}")    
-                                </span>
-                            } else {
-                                <a href="#" class="text-warning" data-url='@Url.Action("Index", "Answer", new {id = Model.Categories[c].Answers[a].AnswerId})' data-toggle="modal" data-answerid="@(Model.Categories[c].Answers[a].AnswerId)">
-                                    @($"${Model.Categories[c].Answers[a].AnswerValue}")
-                                </a>
-                            }
-                        </h2>
+                        @if (Model.Categories[c].Answers[a].HasBeenRead == true) {
+                            <span class="text-primary">
+                                @($"${Model.Categories[c].Answers[a].AnswerValue}")    
+                            </span>
+                        } else {
+                            <a href="#" class="text-warning" data-url='@Url.Action("Index", "Answer", new {id = Model.Categories[c].Answers[a].AnswerId})' data-toggle="modal" data-answerid="@(Model.Categories[c].Answers[a].AnswerId)">
+                                @($"${Model.Categories[c].Answers[a].AnswerValue}")
+                            </a>
+                        }
                     }
+                </div>
             </div>
         }
     </div>
